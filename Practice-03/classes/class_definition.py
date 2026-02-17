@@ -6,6 +6,6 @@ class Person:
     def greet(self):
         print("Hello! I am a person.")
 
-# Создаем объект класса
+# Create an object of the class
 person1 = Person()
 person1.greet()

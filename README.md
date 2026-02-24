@@ -1,3 +1,3 @@
-Overview
+# Practice 4 - Python Advanced Topics
 
-This repository contains Python practice examples for functions, lambda expressions, classes, and inheritance.
+This repository contains Python exercises for **iterators, generators, dates, math, and JSON**.

@@ -1,4 +1,4 @@
-import math
+import math 
 
 # 1️ Convert degree to radian
 degree = float(input("Input degree: "))

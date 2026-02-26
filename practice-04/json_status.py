@@ -1,8 +1,8 @@
 import json
 
 # Load JSON data from file
-with open("sample-data.json") as f:
-    data = json.load(f)
+with open(r"C:\Users\Aruka\Desktop\practice4\practice-04\sample-data.json", "r") as file:
+    data = json.load(file)
 
 # Print table header
 print("Interface Status")

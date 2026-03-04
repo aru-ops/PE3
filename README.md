@@ -1,3 +1,4 @@
-# Practice 4 - Python Advanced Topics
+# Practice5 – Receipt Parsing with Python RegEx
 
-This repository contains Python exercises for **iterators, generators, dates, math, and JSON**.
+This project parses a raw receipt text file using Python and Regular Expressions.
+

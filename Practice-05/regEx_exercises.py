@@ -6,7 +6,7 @@ if re.search(r"ab*", text1):
     print("1: Match found")
 
 # 2. 'a' followed by 2 to 3 'b'
-text2 = "abbb"
+text2 = "ab"
 if re.search(r"ab{2,3}", text2):
     print("2: Match found")
 
@@ -21,8 +21,8 @@ matches4 = re.findall(r"[A-Z][a-z]+", text4)
 print("4:", matches4)
 
 # 5. 'a' followed by anything ending in 'b'
-text5 = "axxxb"
-if re.search(r"a.*b", text5):
+text5 = "axxxbc"
+if re.search(r"a.*b$", text5):
     print("5: Match found")
 
 # 6. Replace space, comma, dot with colon

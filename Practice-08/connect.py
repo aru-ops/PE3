@@ -1,8 +1,15 @@
-# This file creates a connection to PostgreSQL.
-
 import psycopg2
 from config import config
 
+
 def connect():
-    # Return a database connection using settings from config.py
-    return psycopg2.connect(**config())
+    """Connect to PostgreSQL database"""
+    conn = None
+    try:
+        params = config()
+        conn = psycopg2.connect(**params)
+        print("Connected to PostgreSQL successfully!")
+        return conn
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Connection error:", error)
+        return None

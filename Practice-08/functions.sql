@@ -1,37 +1,41 @@
--- This file contains PostgreSQL functions for the PhoneBook.
+-- =========================================
+-- FUNCTIONS
+-- =========================================
 
--- Create table first if it does not exist
-CREATE TABLE IF NOT EXISTS contacts (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    surname VARCHAR(100),
-    phone VARCHAR(20)
-);
-
--- Function 1: Search contacts by pattern
--- It searches in name, surname, and phone
-CREATE OR REPLACE FUNCTION get_contacts_by_pattern(p_pattern TEXT)
-RETURNS TABLE(id INT, name VARCHAR, surname VARCHAR, phone VARCHAR) AS $$
+-- 1. Search contacts by pattern
+CREATE OR REPLACE FUNCTION search_contacts(pattern_text TEXT)
+RETURNS TABLE (
+    contact_id INT,
+    first_name VARCHAR,
+    last_name VARCHAR,
+    phone_number VARCHAR
+)
+AS $$
 BEGIN
     RETURN QUERY
-    SELECT c.id, c.name, c.surname, c.phone
-    FROM contacts c
-    WHERE c.name ILIKE '%' || p_pattern || '%'
-       OR c.surname ILIKE '%' || p_pattern || '%'
-       OR c.phone ILIKE '%' || p_pattern || '%';
+    SELECT p.contact_id, p.first_name, p.last_name, p.phone_number
+    FROM phonebook p
+    WHERE p.first_name ILIKE '%' || pattern_text || '%'
+       OR p.last_name ILIKE '%' || pattern_text || '%'
+       OR p.phone_number ILIKE '%' || pattern_text || '%';
 END;
 $$ LANGUAGE plpgsql;
 
--- Function 2: Get contacts with pagination
--- LIMIT = how many rows to show
--- OFFSET = how many rows to skip
-CREATE OR REPLACE FUNCTION get_contacts_paginated(p_limit INT, p_offset INT)
-RETURNS TABLE(id INT, name VARCHAR, surname VARCHAR, phone VARCHAR) AS $$
+
+-- 2. Pagination function
+CREATE OR REPLACE FUNCTION get_contacts_paginated(limit_count INT, offset_count INT)
+RETURNS TABLE (
+    contact_id INT,
+    first_name VARCHAR,
+    last_name VARCHAR,
+    phone_number VARCHAR
+)
+AS $$
 BEGIN
     RETURN QUERY
-    SELECT c.id, c.name, c.surname, c.phone
-    FROM contacts c
-    ORDER BY c.id
-    LIMIT p_limit OFFSET p_offset;
+    SELECT p.contact_id, p.first_name, p.last_name, p.phone_number
+    FROM phonebook p
+    ORDER BY p.contact_id
+    LIMIT limit_count OFFSET offset_count;
 END;
 $$ LANGUAGE plpgsql;

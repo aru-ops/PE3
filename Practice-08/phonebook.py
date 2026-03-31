@@ -1,167 +1,302 @@
-# This program works with PostgreSQL PhoneBook
-# using functions and stored procedures.
 import psycopg2
 import os
 from connect import connect
 
+
+
+# =========================================
+# CREATE TABLE
+# =========================================
 def create_table():
-    # Create contacts table if it does not exist
-    query = """
-    CREATE TABLE IF NOT EXISTS contacts (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100),
-        surname VARCHAR(100),
-        phone VARCHAR(20)
-    );
-    """
     conn = connect()
-    cur = conn.cursor()
-    cur.execute(query)
-    conn.commit()
-    cur.close()
-    conn.close()
-    print("Table created successfully.")
+    if conn is None:
+        return
 
-def run_sql_file(filename):
-    # Execute SQL from a file
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS phonebook (
+                contact_id SERIAL PRIMARY KEY,
+                first_name VARCHAR(255) NOT NULL,
+                last_name VARCHAR(255),
+                phone_number VARCHAR(20) UNIQUE NOT NULL
+            )
+        """)
+        conn.commit()
+        cur.close()
+        print("Table created successfully.")
+    except Exception as e:
+        print("Error creating table:", e)
+    finally:
+        conn.close()
+
+
+# =========================================
+# EXECUTE SQL FILES
+# =========================================
+import os
+
+def execute_sql_file(filename):
     conn = connect()
-    cur = conn.cursor()
+    if conn is None:
+        return
 
-    with open(filename, "r", encoding="utf-8") as file:
-        sql = file.read()
-        cur.execute(sql)
+    try:
+        cur = conn.cursor()
 
-    conn.commit()
-    cur.close()
-    conn.close()
-    print(f"{filename} executed successfully.")
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(base_dir, filename)
 
+        with open(file_path, "r", encoding="utf-8") as f:
+            sql = f.read()
+            cur.execute(sql)
+
+        conn.commit()
+        cur.close()
+        print(f"{filename} executed successfully.")
+    except Exception as e:
+        print(f"Error executing {filename}:", e)
+    finally:
+        conn.close()
+
+
+# =========================================
+# UPSERT ONE CONTACT
+# =========================================
 def upsert_contact():
-    # Insert or update one contact
-    name = input("Enter name: ")
-    surname = input("Enter surname: ")
-    phone = input("Enter phone: ")
+    first_name = input("Enter first name: ")
+    last_name = input("Enter last name: ")
+    phone = input("Enter phone number: ")
 
     conn = connect()
-    cur = conn.cursor()
-    cur.execute("CALL upsert_contact(%s, %s, %s);", (name, surname, phone))
-    conn.commit()
-    cur.close()
-    conn.close()
+    if conn is None:
+        return
 
-    print("Contact inserted/updated successfully.")
+    try:
+        cur = conn.cursor()
+        cur.execute("CALL upsert_contact(%s, %s, %s)", (first_name, last_name, phone))
+        conn.commit()
+        cur.close()
+        print("Contact inserted/updated successfully.")
+    except Exception as e:
+        print("Error:", e)
+    finally:
+        conn.close()
 
-def show_all_contacts():
-    # Show all contacts from the table
-    conn = connect()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM contacts ORDER BY id;")
-    rows = cur.fetchall()
 
-    print("\n--- CONTACTS ---")
-    for row in rows:
-        print(row)
-
-    cur.close()
-    conn.close()
-
+# =========================================
+# SEARCH CONTACTS BY PATTERN
+# =========================================
 def search_contacts():
-    # Search contacts using PostgreSQL function
-    pattern = input("Enter search pattern: ")
+    pattern = input("Enter pattern to search: ")
 
     conn = connect()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM get_contacts_by_pattern(%s);", (pattern,))
-    rows = cur.fetchall()
+    if conn is None:
+        return
 
-    print("\n--- SEARCH RESULTS ---")
-    for row in rows:
-        print(row)
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM search_contacts(%s)", (pattern,))
+        rows = cur.fetchall()
 
-    cur.close()
-    conn.close()
+        if rows:
+            print("\n--- Search Results ---")
+            for row in rows:
+                print(f"ID: {row[0]}, First Name: {row[1]}, Last Name: {row[2]}, Phone: {row[3]}")
+        else:
+            print("No matching contacts found.")
 
-def paginated_contacts():
-    # Show contacts with limit and offset
-    limit = int(input("Enter LIMIT: "))
-    offset = int(input("Enter OFFSET: "))
+        cur.close()
+    except Exception as e:
+        print("Error:", e)
+    finally:
+        conn.close()
+
+
+# =========================================
+# PAGINATION
+# =========================================
+def get_paginated_contacts():
+    limit_count = int(input("Enter LIMIT: "))
+    offset_count = int(input("Enter OFFSET: "))
 
     conn = connect()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM get_contacts_paginated(%s, %s);", (limit, offset))
-    rows = cur.fetchall()
+    if conn is None:
+        return
 
-    print("\n--- PAGINATED RESULTS ---")
-    for row in rows:
-        print(row)
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM get_contacts_paginated(%s, %s)", (limit_count, offset_count))
+        rows = cur.fetchall()
 
-    cur.close()
-    conn.close()
+        if rows:
+            print("\n--- Paginated Contacts ---")
+            for row in rows:
+                print(f"ID: {row[0]}, First Name: {row[1]}, Last Name: {row[2]}, Phone: {row[3]}")
+        else:
+            print("No contacts found.")
 
-def bulk_insert():
-    # Run procedure that inserts many contacts
-    conn = connect()
-    cur = conn.cursor()
-    cur.execute("CALL insert_many_contacts();")
-    conn.commit()
-    cur.close()
-    conn.close()
+        cur.close()
+    except Exception as e:
+        print("Error:", e)
+    finally:
+        conn.close()
 
-    print("Bulk insert completed. Check PostgreSQL notices for invalid data.")
 
+# =========================================
+# DELETE CONTACT
+# =========================================
 def delete_contact():
-    # Delete contact by name, surname, or phone
-    value = input("Enter name, surname, or phone to delete: ")
+    value = input("Enter first name, last name, or phone to delete: ")
 
     conn = connect()
-    cur = conn.cursor()
-    cur.execute("CALL delete_contact(%s);", (value,))
-    conn.commit()
-    cur.close()
-    conn.close()
+    if conn is None:
+        return
 
-    print("Contact deleted if it existed.")
+    try:
+        cur = conn.cursor()
+        cur.execute("CALL delete_contact(%s)", (value,))
+        conn.commit()
+        cur.close()
+        print("Contact(s) deleted successfully.")
+    except Exception as e:
+        print("Error:", e)
+    finally:
+        conn.close()
 
+
+# =========================================
+# INSERT MANY CONTACTS
+# =========================================
+def insert_many_contacts():
+    n = int(input("How many contacts do you want to insert? "))
+
+    first_names = []
+    last_names = []
+    phones = []
+
+    for i in range(n):
+        print(f"\nContact {i+1}")
+        first_names.append(input("First name: "))
+        last_names.append(input("Last name: "))
+        phones.append(input("Phone number: "))
+
+    conn = connect()
+    if conn is None:
+        return
+
+    try:
+        cur = conn.cursor()
+        cur.execute("CALL insert_many_contacts(%s, %s, %s)", (first_names, last_names, phones))
+        conn.commit()
+        cur.close()
+        print("Bulk insert completed.")
+    except Exception as e:
+        print("Error:", e)
+    finally:
+        conn.close()
+
+
+# =========================================
+# SHOW ALL CONTACTS
+# =========================================
+def show_all_contacts():
+    conn = connect()
+    if conn is None:
+        return
+
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM phonebook ORDER BY contact_id")
+        rows = cur.fetchall()
+
+        if rows:
+            print("\n--- All Contacts ---")
+            for row in rows:
+                print(f"ID: {row[0]}, First Name: {row[1]}, Last Name: {row[2]}, Phone: {row[3]}")
+        else:
+            print("Phonebook is empty.")
+
+        cur.close()
+    except Exception as e:
+        print("Error:", e)
+    finally:
+        conn.close()
+
+
+# =========================================
+# SHOW INVALID CONTACTS
+# =========================================
+def show_invalid_contacts():
+    conn = connect()
+    if conn is None:
+        return
+
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM invalid_contacts ORDER BY id")
+        rows = cur.fetchall()
+
+        if rows:
+            print("\n--- Invalid Contacts ---")
+            for row in rows:
+                print(f"ID: {row[0]}, First Name: {row[1]}, Last Name: {row[2]}, Phone: {row[3]}, Error: {row[4]}")
+        else:
+            print("No invalid contacts found.")
+
+        cur.close()
+    except Exception as e:
+        print("Error:", e)
+    finally:
+        conn.close()
+
+
+# =========================================
+# MENU
+# =========================================
 def menu():
-    # Main menu for user actions
     while True:
         print("\n===== PHONEBOOK MENU =====")
         print("1. Create table")
-        print("2. Run functions.sql")
-        print("3. Run procedures.sql")
-        print("4. Insert or update contact")
-        print("5. Show all contacts")
-        print("6. Search contacts")
-        print("7. Show paginated contacts")
-        print("8. Bulk insert test data")
-        print("9. Delete contact")
-        print("10. Exit")
+        print("2. Load functions.sql")
+        print("3. Load procedures.sql")
+        print("4. Insert/Update one contact")
+        print("5. Search contacts by pattern")
+        print("6. Show contacts with pagination")
+        print("7. Delete contact")
+        print("8. Insert many contacts")
+        print("9. Show all contacts")
+        print("10. Show invalid contacts")
+        print("0. Exit")
 
         choice = input("Choose an option: ")
 
         if choice == "1":
             create_table()
         elif choice == "2":
-            run_sql_file("functions.sql")
+            execute_sql_file("functions.sql")
         elif choice == "3":
-            run_sql_file("procedures.sql")
+            execute_sql_file("procedures.sql")
         elif choice == "4":
             upsert_contact()
         elif choice == "5":
-            show_all_contacts()
-        elif choice == "6":
             search_contacts()
+        elif choice == "6":
+            get_paginated_contacts()
         elif choice == "7":
-            paginated_contacts()
-        elif choice == "8":
-            bulk_insert()
-        elif choice == "9":
             delete_contact()
+        elif choice == "8":
+            insert_many_contacts()
+        elif choice == "9":
+            show_all_contacts()
         elif choice == "10":
+            show_invalid_contacts()
+        elif choice == "0":
             print("Goodbye!")
             break
         else:
-            print("Invalid option. Try again.")
+            print("Invalid choice. Try again.")
+
 
 if __name__ == "__main__":
     menu()

@@ -5,6 +5,6 @@ def config():
         "host": "localhost",
         "database": "phonebook",
         "user": "postgres",
-        "password": "1234",   # Change this to your PostgreSQL password
+        "password": "12345678",  
         "port": 5432
     }

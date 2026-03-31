@@ -6,9 +6,6 @@ def config():
         "host": "localhost",
         "database": "phonebook",
         "user": "postgres",
-        "password": "12345678",  
+        "password": "1234",   # Change this to your PostgreSQL password
         "port": 5432
     }
-
-def connect():
-    return psycopg2.connect(**config())

@@ -1,6 +1,7 @@
 # This program works with PostgreSQL PhoneBook
 # using functions and stored procedures.
-
+import psycopg2
+import os
 from connect import connect
 
 def create_table():

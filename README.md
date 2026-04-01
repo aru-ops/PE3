@@ -1,5 +1,3 @@
-# Practice 6: Python File Handling and Built-in Functions
+PhoneBook Practice 8:
 
-## Objective
-This practice demonstrates how to work with files, directories, and commonly used built-in functions in Python.
-
+PostgreSQL functions and stored procedures for managing contacts with search, upsert, bulk insert, pagination, and deletion.

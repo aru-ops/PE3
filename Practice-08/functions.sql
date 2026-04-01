@@ -1,7 +1,3 @@
--- =========================================
--- FUNCTIONS
--- =========================================
-
 -- 1. Search contacts by pattern
 CREATE OR REPLACE FUNCTION search_contacts(pattern_text TEXT)
 RETURNS TABLE (

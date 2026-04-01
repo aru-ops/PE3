@@ -1,9 +1,7 @@
--- =========================================
 -- PROCEDURES
--- =========================================
 
 -- 1. Insert or update one contact
-CREATE OR REPLACE PROCEDURE upsert_contact(
+CREATE OR REPLACE PROCEDURE upsert_contact(  -- update if it exists + insert if not
     p_first_name VARCHAR,
     p_last_name VARCHAR,
     p_phone VARCHAR
@@ -16,7 +14,7 @@ BEGIN
         SELECT 1
         FROM phonebook
         WHERE first_name = p_first_name
-          AND COALESCE(last_name, '') = COALESCE(p_last_name, '')
+          AND COALESCE(last_name, '') = COALESCE(p_last_name, '') -- coalesce(x,y) if x=null then get y
     ) THEN
         -- Update phone if contact exists
         UPDATE phonebook
@@ -46,7 +44,7 @@ CREATE TABLE IF NOT EXISTS invalid_contacts (
 CREATE OR REPLACE PROCEDURE insert_many_contacts(
     first_names TEXT[],
     last_names TEXT[],
-    phones TEXT[]
+    phones TEXT[]  -- accepts arrays for inserting multiple contacts at once
 )
 LANGUAGE plpgsql
 AS $$
@@ -56,7 +54,7 @@ BEGIN
     -- Check that all arrays have the same size
     IF array_length(first_names, 1) IS DISTINCT FROM array_length(last_names, 1)
        OR array_length(first_names, 1) IS DISTINCT FROM array_length(phones, 1) THEN
-        RAISE EXCEPTION 'All arrays must have the same length';
+        RAISE EXCEPTION 'All arrays must have the same length';   -- check that all arrays have the same length before processing them
     END IF;
 
     -- Loop through all contacts

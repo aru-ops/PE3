@@ -1,5 +1,5 @@
 -- 1. Search contacts by pattern
-CREATE OR REPLACE FUNCTION search_contacts(pattern_text TEXT)
+CREATE OR REPLACE FUNCTION search_contacts(pattern_text TEXT) 
 RETURNS TABLE (
     contact_id INT,
     first_name VARCHAR,
@@ -32,6 +32,6 @@ BEGIN
     SELECT p.contact_id, p.first_name, p.last_name, p.phone_number
     FROM phonebook p
     ORDER BY p.contact_id
-    LIMIT limit_count OFFSET offset_count;
+    LIMIT limit_count OFFSET offset_count;     -- limits the number of lines and skips lines 
 END;
 $$ LANGUAGE plpgsql;

@@ -1,25 +1,27 @@
 import pygame
 
 class MusicPlayer:
-    def __init__(self, tracks):
-        self.tracks = tracks
-        self.index = 0
+    def __init__(self):
         pygame.mixer.init()
 
+        self.playlist = [
+            "music/sample_tracks/track1.wav",
+            "music/sample_tracks/track2.wav"
+        ]
+
+        self.index = 0
+
     def play(self):
-        pygame.mixer.music.load(self.tracks[self.index])
+        pygame.mixer.music.load(self.playlist[self.index])
         pygame.mixer.music.play()
 
     def stop(self):
         pygame.mixer.music.stop()
 
     def next(self):
-        self.index = (self.index + 1) % len(self.tracks)
+        self.index = (self.index + 1) % len(self.playlist)
         self.play()
 
     def prev(self):
-        self.index = (self.index - 1) % len(self.tracks)
+        self.index = (self.index - 1) % len(self.playlist)
         self.play()
-
-    def get_current_track(self):
-        return self.tracks[self.index]

@@ -1,3 +1,4 @@
-PhoneBook Practice 8:
+# Practice 09 - Pygame Games Collection 🎮
 
-PostgreSQL functions and stored procedures for managing contacts with search, upsert, bulk insert, pagination, and deletion.
+This project contains three mini-games built using Python and Pygame:
+

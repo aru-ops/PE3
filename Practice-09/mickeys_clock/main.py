@@ -12,7 +12,7 @@ pygame.display.set_caption("Mickey Clock")
 clock = pygame.time.Clock()
 
 # загрузка изображения руки
-hand_img = pygame.image.load("images/mickey_hand.png")
+hand_img = pygame.image.load("images/mickeyclock.jpeg")
 hand_img = pygame.transform.scale(hand_img, (100, 100))
 
 while True:

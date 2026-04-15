@@ -5,10 +5,10 @@ class MusicPlayer:
         pygame.mixer.init()
 
         self.playlist = [
-    "music_player/music/sample_tracks/track1.wav",
-    "music_player/music/sample_tracks/track2.wav",
-    "music_player/music/sample_tracks/track3.wav"]
-
+    "music/sample_tracks/track1.wav",
+    "music/sample_tracks/track2.wav",
+    "music/sample_tracks/track3.wav"
+]
         self.index = 0
 
     def play(self):

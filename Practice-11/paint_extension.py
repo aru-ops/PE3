@@ -1,331 +1,303 @@
-# paint_extension.py
 import pygame
-import sys
 import math
 
 # Initialize Pygame
 pygame.init()
 
-# Constants
-SCREEN_WIDTH = 900
-SCREEN_HEIGHT = 700
-TOOLBAR_WIDTH = 150
-CANVAS_WIDTH = SCREEN_WIDTH - TOOLBAR_WIDTH
-CANVAS_HEIGHT = SCREEN_HEIGHT
+# --- Constants ---
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT =600
+CANVAS_WIDTH = 600
+CANVAS_HEIGHT = 500
+PALETTE_WIDTH = 150
+TOOLBAR_HEIGHT = 50
 
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-DARK_GRAY = (150, 150, 150)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
-PURPLE = (255, 0, 255)
-CYAN = (0, 255, 255)
+PURPLE = (128, 0, 128)
+ORANGE = (255, 165, 0)
+GRAY = (128, 128, 128)
 
-class Shape:
-    """Base class for all drawable shapes"""
-    class Type:
-        SQUARE = 0
-        RIGHT_TRIANGLE = 1
-        EQUILATERAL_TRIANGLE = 2
-        RHOMBUS = 3
+# Tools (Extended with new shapes)
+PEN = 0
+RECTANGLE = 1
+CIRCLE = 2
+ERASER = 3
+SQUARE = 4          # New: Square shape
+RIGHT_TRIANGLE = 5  # New: Right triangle
+EQUILATERAL = 6     # New: Equilateral triangle
+RHOMBUS = 7         # New: Rhombus (diamond)
+
+# --- Game Window Setup ---
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Paint Program - Extended Shapes")
+clock = pygame.time.Clock()
+
+# --- Drawing Surface ---
+canvas = pygame.Surface((CANVAS_WIDTH, CANVAS_HEIGHT))
+canvas.fill(WHITE)  # Start with a white canvas
+
+# --- Game Variables ---
+current_tool = PEN
+current_color = BLACK
+drawing = False
+start_pos = None
+end_pos = None
+
+# Brush size
+brush_size = 5
+eraser_size = 20
+
+# --- Color Palette (Rectangles) ---
+palette = [
+    {"color": BLACK, "rect": pygame.Rect(620, 60, 30, 30)},
+    {"color": RED, "rect": pygame.Rect(660, 60, 30, 30)},
+    {"color": GREEN, "rect": pygame.Rect(700, 60, 30, 30)},
+    {"color": BLUE, "rect": pygame.Rect(740, 60, 30, 30)},
+    {"color": YELLOW, "rect": pygame.Rect(620, 100, 30, 30)},
+    {"color": PURPLE, "rect": pygame.Rect(660, 100, 30, 30)},
+    {"color": ORANGE, "rect": pygame.Rect(700, 100, 30, 30)},
+    {"color": WHITE, "rect": pygame.Rect(740, 100, 30, 30)}  # White for eraser?
+]
+
+# --- Tool Buttons (Extended with new shape buttons) ---
+tool_buttons = [
+    {"tool": PEN, "rect": pygame.Rect(620, 150, 60, 30), "text": "Pen"},
+    {"tool": RECTANGLE, "rect": pygame.Rect(690, 150, 60, 30), "text": "Rect"},
+    {"tool": CIRCLE, "rect": pygame.Rect(620, 190, 60, 30), "text": "Circle"},
+    {"tool": ERASER, "rect": pygame.Rect(690, 190, 60, 30), "text": "Eraser"},
+    # New shape buttons
+    {"tool": SQUARE, "rect": pygame.Rect(620, 230, 80, 30), "text": "Square"},
+    {"tool": RIGHT_TRIANGLE, "rect": pygame.Rect(710, 230, 80, 30), "text": "Right Tri"},
+    {"tool": EQUILATERAL, "rect": pygame.Rect(620, 270, 80, 30), "text": "Equilateral"},
+    {"tool": RHOMBUS, "rect": pygame.Rect(710, 270, 80, 30), "text": "Rhombus"},
+]
+
+# Font for button labels
+font = pygame.font.SysFont("Arial", 14)
+
+def draw_ui():
+    """Draw the user interface (color palette and tool buttons)."""
+    # Draw palette background
+    pygame.draw.rect(screen, GRAY, (CANVAS_WIDTH, 0, PALETTE_WIDTH, SCREEN_HEIGHT))
+
+    # Draw color squares
+    for color_info in palette:
+        pygame.draw.rect(screen, color_info["color"], color_info["rect"])
+        pygame.draw.rect(screen, BLACK, color_info["rect"], 2)  # Border
+
+    # Draw tool buttons
+    for button in tool_buttons:
+        # Highlight active tool with different color
+        if button["tool"] == current_tool:
+            pygame.draw.rect(screen, (100, 100, 200), button["rect"])  # Highlight
+        else:
+            pygame.draw.rect(screen, GRAY, button["rect"])
+        pygame.draw.rect(screen, BLACK, button["rect"], 2)
+        text = font.render(button["text"], True, BLACK)
+        text_rect = text.get_rect(center=button["rect"].center)
+        screen.blit(text, text_rect)
+
+def draw_square(surface, color, start, end):
+    """
+    Draw a square (all sides equal).
+    Uses the smaller of width and height to maintain square proportions.
+    """
+    x1, y1 = start
+    x2, y2 = end
+    width = abs(x2 - x1)
+    height = abs(y2 - y1)
+    size = min(width, height)  # Make it a perfect square
+    
+    # Determine top-left corner
+    x = min(x1, x2)
+    y = min(y1, y2)
+    
+    # If mouse dragged left or up, adjust position
+    if x2 < x1:
+        x = x1 - size
+    if y2 < y1:
+        y = y1 - size
         
-    def __init__(self, shape_type, start_pos, end_pos, color, size=100):
-        self.type = shape_type
-        self.start_pos = start_pos
-        self.end_pos = end_pos
-        self.color = color
-        self.size = size
-        
-    def draw(self, screen):
-        """Draw shape based on its type"""
-        if self.type == Shape.Type.SQUARE:
-            self.draw_square(screen)
-        elif self.type == Shape.Type.RIGHT_TRIANGLE:
-            self.draw_right_triangle(screen)
-        elif self.type == Shape.Type.EQUILATERAL_TRIANGLE:
-            self.draw_equilateral_triangle(screen)
-        elif self.type == Shape.Type.RHOMBUS:
-            self.draw_rhombus(screen)
-            
-    def draw_square(self, screen):
-        """Draw a square using the end position as the opposite corner"""
-        x1, y1 = self.start_pos
-        x2, y2 = self.end_pos
-        width = abs(x2 - x1)
-        height = abs(y2 - y1)
-        size = min(width, height)  # Make it square
-        x = min(x1, x2)
-        y = min(y1, y2)
-        pygame.draw.rect(screen, self.color, (x, y, size, size), 3)
-        
-    def draw_right_triangle(self, screen):
-        """Draw a right triangle (90-degree angle at top-left)"""
-        x1, y1 = self.start_pos
-        x2, y2 = self.end_pos
-        width = x2 - x1
-        height = y2 - y1
-        
-        # Triangle vertices: top-left, top-right, bottom-left
-        points = [(x1, y1), (x2, y1), (x1, y2)]
-        pygame.draw.polygon(screen, self.color, points, 3)
-        
-    def draw_equilateral_triangle(self, screen):
-        """Draw an equilateral triangle (all sides equal)"""
-        x1, y1 = self.start_pos
-        x2, y2 = self.end_pos
-        
-        # Calculate side length and height
-        side_length = abs(x2 - x1)
-        height = side_length * math.sqrt(3) / 2
-        
-        # Determine orientation based on mouse movement
-        if y2 > y1:  # Pointing down
-            points = [
-                (x1, y1),  # Top vertex
-                (x1 - side_length//2, y1 + height),  # Bottom left
-                (x1 + side_length//2, y1 + height)   # Bottom right
-            ]
-        else:  # Pointing up
-            points = [
-                (x1, y1),  # Bottom vertex
-                (x1 - side_length//2, y1 - height),  # Top left
-                (x1 + side_length//2, y1 - height)   # Top right
-            ]
-        pygame.draw.polygon(screen, self.color, points, 3)
-        
-    def draw_rhombus(self, screen):
-        """Draw a rhombus (diamond shape)"""
-        center_x, center_y = self.start_pos
-        x2, y2 = self.end_pos
-        
-        # Calculate width and height from mouse position
-        width = abs(x2 - center_x)
-        height = abs(y2 - center_y)
-        
-        # Four vertices of rhombus
+    pygame.draw.rect(surface, color, (x, y, size, size), 2)  # Outline only
+
+def draw_right_triangle(surface, color, start, end):
+    """
+    Draw a right triangle (90-degree angle).
+    The right angle is at the start position (top-left).
+    """
+    x1, y1 = start
+    x2, y2 = end
+    
+    # Three points of the right triangle
+    points = [
+        (x1, y1),           # Top-left (right angle corner)
+        (x2, y1),           # Top-right
+        (x1, y2)            # Bottom-left
+    ]
+    pygame.draw.polygon(surface, color, points, 2)
+
+def draw_equilateral_triangle(surface, color, start, end):
+    """
+    Draw an equilateral triangle (all sides equal).
+    The triangle orientation depends on mouse movement direction.
+    """
+    x1, y1 = start
+    x2, y2 = end
+    
+    side_length = abs(x2 - x1)
+    height = side_length * math.sqrt(3) / 2  # Height of equilateral triangle
+    
+    # Determine triangle orientation based on mouse Y movement
+    if y2 > y1:  # Mouse moved DOWN - triangle points down
         points = [
-            (center_x, center_y - height),  # Top
-            (center_x + width, center_y),   # Right
-            (center_x, center_y + height),  # Bottom
-            (center_x - width, center_y)    # Left
+            (x1, y1),                                      # Top vertex
+            (x1 - side_length//2, y1 + height),           # Bottom-left
+            (x1 + side_length//2, y1 + height)            # Bottom-right
         ]
-        pygame.draw.polygon(screen, self.color, points, 3)
+    else:  # Mouse moved UP - triangle points up
+        points = [
+            (x1, y1),                                      # Bottom vertex
+            (x1 - side_length//2, y1 - height),           # Top-left
+            (x1 + side_length//2, y1 - height)            # Top-right
+        ]
+    pygame.draw.polygon(surface, color, points, 2)
 
-class PaintApp:
-    def __init__(self):
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption("Paint - Shape Drawer")
-        self.clock = pygame.time.Clock()
-        self.font = pygame.font.Font(None, 24)
+def draw_rhombus(surface, color, start, end):
+    """
+    Draw a rhombus (diamond shape).
+    Uses start point as center, end point determines width and height.
+    """
+    center_x, center_y = start
+    x2, y2 = end
+    
+    # Calculate width and height from center
+    width = abs(x2 - center_x)
+    height = abs(y2 - center_y)
+    
+    # Four vertices of the rhombus (diamond)
+    points = [
+        (center_x, center_y - height),   # Top
+        (center_x + width, center_y),    # Right
+        (center_x, center_y + height),   # Bottom
+        (center_x - width, center_y)     # Left
+    ]
+    pygame.draw.polygon(surface, color, points, 2)
+
+def draw_shape(surface, tool, color, start, end):
+    """
+    Draw a shape on the given surface.
+    Extended to support all new shape types.
+    """
+    if tool == RECTANGLE:
+        x = min(start[0], end[0])
+        y = min(start[1], end[1])
+        w = abs(start[0] - end[0])
+        h = abs(start[1] - end[1])
+        pygame.draw.rect(surface, color, (x, y, w, h), 2)
         
-        # Canvas surface
-        self.canvas = pygame.Surface((CANVAS_WIDTH, CANVAS_HEIGHT))
-        self.canvas.fill(WHITE)
+    elif tool == CIRCLE:
+        center = ((start[0] + end[0]) // 2, (start[1] + end[1]) // 2)
+        radius = max(abs(start[0] - end[0]), abs(start[1] - end[1])) // 2
+        pygame.draw.circle(surface, color, center, radius, 2)
         
-        # Drawing state
-        self.current_shape_type = Shape.Type.SQUARE
-        self.current_color = BLACK
-        self.drawing = False
-        self.start_pos = None
-        self.shapes = []
-        self.preview_shape = None
+    elif tool == PEN:
+        pygame.draw.line(surface, color, start, end, brush_size)
         
-        # Toolbar buttons
-        self.buttons = {}
-        self.create_toolbar()
+    elif tool == ERASER:
+        pygame.draw.circle(surface, WHITE, end, eraser_size)
         
-    def create_toolbar(self):
-        """Create toolbar with shape buttons"""
-        y_offset = 50
-        button_height = 40
+    # New shape drawing functions
+    elif tool == SQUARE:
+        draw_square(surface, color, start, end)
         
-        # Shape buttons
-        shapes = [
-            ("Square", Shape.Type.SQUARE),
-            ("Right Triangle", Shape.Type.RIGHT_TRIANGLE),
-            ("Equilateral", Shape.Type.EQUILATERAL_TRIANGLE),
-            ("Rhombus", Shape.Type.RHOMBUS)
-        ]
+    elif tool == RIGHT_TRIANGLE:
+        draw_right_triangle(surface, color, start, end)
         
-        for name, shape_type in shapes:
-            rect = pygame.Rect(SCREEN_WIDTH - TOOLBAR_WIDTH + 10, y_offset, 
-                              TOOLBAR_WIDTH - 20, button_height)
-            self.buttons[shape_type] = {"rect": rect, "name": name}
-            y_offset += button_height + 10
-            
-        # Color buttons
-        colors = [
-            (BLACK, "Black"),
-            (RED, "Red"),
-            (GREEN, "Green"),
-            (BLUE, "Blue"),
-            (YELLOW, "Yellow")
-        ]
+    elif tool == EQUILATERAL:
+        draw_equilateral_triangle(surface, color, start, end)
         
-        y_offset += 20
-        for color, name in colors:
-            rect = pygame.Rect(SCREEN_WIDTH - TOOLBAR_WIDTH + 10, y_offset,
-                              TOOLBAR_WIDTH - 20, 30)
-            self.buttons[color] = {"rect": rect, "name": name, "color": color}
-            y_offset += 40
-            
-        # Clear button
-        clear_rect = pygame.Rect(SCREEN_WIDTH - TOOLBAR_WIDTH + 10, SCREEN_HEIGHT - 80,
-                                TOOLBAR_WIDTH - 20, 40)
-        self.buttons["clear"] = {"rect": clear_rect, "name": "Clear Canvas"}
-        
-    def draw_toolbar(self):
-        """Draw the toolbar interface"""
-        # Toolbar background
-        pygame.draw.rect(self.screen, GRAY, 
-                        (SCREEN_WIDTH - TOOLBAR_WIDTH, 0, TOOLBAR_WIDTH, SCREEN_HEIGHT))
-        pygame.draw.line(self.screen, BLACK, 
-                        (SCREEN_WIDTH - TOOLBAR_WIDTH, 0), 
-                        (SCREEN_WIDTH - TOOLBAR_WIDTH, SCREEN_HEIGHT), 3)
-        
-        # Title
-        title = self.font.render("SHAPES", True, BLACK)
-        self.screen.blit(title, (SCREEN_WIDTH - TOOLBAR_WIDTH + 10, 10))
-        
-        # Draw all buttons
-        for key, btn in self.buttons.items():
-            # Highlight current selection
-            if key == self.current_shape_type:
-                pygame.draw.rect(self.screen, DARK_GRAY, btn["rect"])
-            elif key == self.current_color:
-                pygame.draw.rect(self.screen, DARK_GRAY, btn["rect"])
-            else:
-                pygame.draw.rect(self.screen, WHITE, btn["rect"])
-                
-            pygame.draw.rect(self.screen, BLACK, btn["rect"], 2)
-            
-            # Draw text or color swatch
-            if "color" in btn:
-                pygame.draw.rect(self.screen, btn["color"], 
-                               (btn["rect"].x + 5, btn["rect"].y + 5, 20, 20))
-                text = self.font.render(btn["name"], True, BLACK)
-                self.screen.blit(text, (btn["rect"].x + 30, btn["rect"].y + 8))
-            else:
-                text = self.font.render(btn["name"], True, BLACK)
-                text_rect = text.get_rect(center=btn["rect"].center)
-                self.screen.blit(text, text_rect)
-                
-    def handle_click(self, pos):
-        """Handle mouse clicks on toolbar"""
-        x, y = pos
-        
-        # Check if click is on toolbar
-        if x > SCREEN_WIDTH - TOOLBAR_WIDTH:
-            for key, btn in self.buttons.items():
-                if btn["rect"].collidepoint(x, y):
-                    if key == "clear":
-                        self.clear_canvas()
-                    elif key in [Shape.Type.SQUARE, Shape.Type.RIGHT_TRIANGLE,
-                                Shape.Type.EQUILATERAL_TRIANGLE, Shape.Type.RHOMBUS]:
-                        self.current_shape_type = key
-                    elif key in [BLACK, RED, GREEN, BLUE, YELLOW]:
-                        self.current_color = key
-                    return True
-        return False
-        
-    def clear_canvas(self):
-        """Clear all shapes from canvas"""
-        self.canvas.fill(WHITE)
-        self.shapes.clear()
-        
-    def start_drawing(self, pos):
-        """Start drawing a new shape"""
-        x, y = pos
-        if x < CANVAS_WIDTH:  # Only draw on canvas area
-            self.drawing = True
-            self.start_pos = (x, y)
-            
-    def update_preview(self, current_pos):
-        """Update shape preview while dragging"""
-        if self.drawing and self.start_pos:
-            self.preview_shape = Shape(
-                self.current_shape_type,
-                self.start_pos,
-                current_pos,
-                self.current_color
-            )
-            
-    def finish_drawing(self, end_pos):
-        """Finish drawing and add shape to canvas"""
-        if self.drawing and self.start_pos:
-            shape = Shape(
-                self.current_shape_type,
-                self.start_pos,
-                end_pos,
-                self.current_color
-            )
-            shape.draw(self.canvas)  # Draw permanently on canvas
-            self.shapes.append(shape)
-            self.drawing = False
-            self.start_pos = None
-            self.preview_shape = None
-            
-    def draw(self):
-        """Draw everything to screen"""
-        # Draw canvas
-        self.screen.blit(self.canvas, (0, 0))
-        
-        # Draw preview shape (while dragging)
-        if self.preview_shape:
-            # Create temporary surface for preview
-            temp_surface = self.canvas.copy()
-            self.preview_shape.draw(temp_surface)
-            self.screen.blit(temp_surface, (0, 0))
-            
-        # Draw toolbar on top
-        self.draw_toolbar()
-        
-        # Draw instructions
-        instructions = [
-            "INSTRUCTIONS:",
-            "Click shape button",
-            "Click color button",
-            "Drag on canvas to draw",
-            "Clear to reset"
-        ]
-        y = SCREEN_HEIGHT - 150
-        for instruction in instructions:
-            text = self.font.render(instruction, True, BLACK)
-            self.screen.blit(text, (10, y))
-            y += 20
-            
-    def run(self):
-        """Main game loop"""
-        running = True
-        
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                    
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:  # Left click
-                        if not self.handle_click(event.pos):
-                            self.start_drawing(event.pos)
-                            
-                elif event.type == pygame.MOUSEMOTION:
-                    self.update_preview(event.pos)
-                    
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    if event.button == 1:
-                        self.finish_drawing(event.pos)
+    elif tool == RHOMBUS:
+        draw_rhombus(surface, color, start, end)
+
+# --- Main Game Loop ---
+running = True
+while running:
+    # --- Event Handling ---
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        # Mouse button down
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Left click
+                x, y = event.pos
+                # Check if click is on color palette
+                for color_info in palette:
+                    if color_info["rect"].collidepoint(x, y):
+                        current_color = color_info["color"]
+                        # If white is selected, it's effectively an eraser
+                        if current_color == WHITE:
+                            current_tool = ERASER
+                        break
                         
-            self.draw()
-            pygame.display.flip()
-            self.clock.tick(60)
-            
-        pygame.quit()
-        sys.exit()
+                # Check if click is on tool buttons
+                for button in tool_buttons:
+                    if button["rect"].collidepoint(x, y):
+                        current_tool = button["tool"]
+                        break
+                        
+                # If click is on canvas, start drawing
+                if x < CANVAS_WIDTH and y < CANVAS_HEIGHT:
+                    drawing = True
+                    start_pos = event.pos
+                    end_pos = event.pos
 
-if __name__ == "__main__":
-    app = PaintApp()
-    app.run()
+        # Mouse motion
+        elif event.type == pygame.MOUSEMOTION and drawing:
+            x, y = event.pos
+            if x < CANVAS_WIDTH and y < CANVAS_HEIGHT:
+                end_pos = event.pos
+                # Draw directly on canvas for pen and eraser (freehand)
+                if current_tool == PEN or current_tool == ERASER:
+                    draw_shape(canvas, current_tool, current_color, start_pos, end_pos)
+                    start_pos = end_pos
+
+        # Mouse button up
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1 and drawing:
+                drawing = False
+                x, y = event.pos
+                if x < CANVAS_WIDTH and y < CANVAS_HEIGHT:
+                    end_pos = event.pos
+                    # Draw final shape on canvas for all shape tools
+                    if current_tool in [RECTANGLE, CIRCLE, SQUARE, RIGHT_TRIANGLE, EQUILATERAL, RHOMBUS]:
+                        draw_shape(canvas, current_tool, current_color, start_pos, end_pos)
+
+    # --- Drawing ---
+    # Clear screen
+    screen.fill(WHITE)
+
+    # Draw canvas
+    screen.blit(canvas, (0, 0))
+
+    # Draw UI elements
+    draw_ui()
+
+    # Draw preview shape while drawing (for shape tools)
+    if drawing and current_tool in [RECTANGLE, CIRCLE, SQUARE, RIGHT_TRIANGLE, EQUILATERAL, RHOMBUS]:
+        # Create a temporary surface for preview
+        temp_surface = canvas.copy()
+        draw_shape(temp_surface, current_tool, current_color, start_pos, end_pos)
+        screen.blit(temp_surface, (0, 0))
+
+    # Update display
+    pygame.display.update()
+    clock.tick(60)
+
+pygame.quit()

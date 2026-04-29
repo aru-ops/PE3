@@ -1,0 +1,4 @@
+first_name,last_name,phone,email,birthday,group,phone_type
+Ivan,Petrov,+77014561234,ivan@example.com,1990-05-15,Work,mobile
+Anna,Sokolova,+77015672345,anna@gmail.com,1985-11-20,Friend,home
+Dmitry,Ivanov,+77016783456,,1988-03-10,Family,work

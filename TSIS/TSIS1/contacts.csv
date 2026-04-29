@@ -1,11 +1,11 @@
-name,email,birthday,group_name,phone,phone_type
-John Doe,johndoe@gmail.com,1990-05-15,Work,+111111111,mobile
-Jane Smith,jane.smith@yahoo.com,1992-10-20,Family,+222222222,home
-Michael Johnson,mike.j@icloud.com,1985-03-08,Friend,+333333333,mobile
-Emily Davis,emily.davis@gmail.com,1998-12-01,Work,+444444444,work
-William Brown,w.brown@company.com,1975-07-22,Work,+555555555,mobile
-Olivia Wilson,olivia.w@hotmail.com,2001-01-14,Friend,+666666666,home
-James Taylor,james.t@gmail.com,1988-09-30,Family,+777777777,mobile
-Sophia Martinez,smartinez@yahoo.com,1995-11-11,Other,+888888888,mobile
-Robert Anderson,rob.anderson@gmail.com,1982-04-18,Friend,+999999999,work
-Isabella Thomas,bella.t@icloud.com,1999-08-25,Family,+000000000,mobile
+name,phone,email,birthday,group
+John Doe,123456789,john.doe@gmail.com,1990-05-15,Work
+Jane Smith,987654321,jane.smith@yahoo.com,1985-08-22,Friend
+Alice Johnson,555123456,alice.j@hotmail.com,1992-11-02,Family
+Bob Brown,333444555,bob.brown@company.com,1988-03-10,Work
+Emma Wilson,222333444,emma.w@icloud.com,1995-07-19,Friend
+Michael Lee,999000111,michael.lee@gmail.com,1983-12-25,Other
+Sophia Martinez,777888999,sophia.m@yahoo.com,1991-04-08,Family
+David Clark,444555666,david.c@work.net,1986-09-14,Work
+Olivia Lewis,111222333,olivia.lewis@gmail.com,1996-01-30,Friend
+James Hall,666777888,james.h@company.com,1989-06-20,Other

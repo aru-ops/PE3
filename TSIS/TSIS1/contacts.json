@@ -1,51 +1,98 @@
 [
   {
-    "name": "Alice Cooper",
-    "email": "alice.cooper@gmail.com",
-    "birthday": "1985-02-10",
-    "group_name": "Friend",
+    "name": "John Doe",
+    "phone": "123456789",
+    "email": "john.doe@gmail.com",
+    "birthday": "1990-05-15",
+    "group": "Work",
     "phones": [
-      {"phone": "+101010101", "type": "mobile"},
-      {"phone": "+202020202", "type": "work"}
+      {"phone": "111222333", "type": "mobile"}
     ]
   },
   {
-    "name": "David Miller",
-    "email": "david.m@company.net",
-    "birthday": "1991-06-12",
-    "group_name": "Work",
+    "name": "Jane Smith",
+    "phone": "987654321",
+    "email": "jane.smith@yahoo.com",
+    "birthday": "1985-08-22",
+    "group": "Friend",
     "phones": [
-      {"phone": "+303030303", "type": "mobile"}
+      {"phone": "444555666", "type": "home"},
+      {"phone": "777888999", "type": "work"}
     ]
   },
   {
-    "name": "Sarah Garcia",
-    "email": "sarah.garcia@yahoo.com",
-    "birthday": "1989-09-05",
-    "group_name": "Family",
+    "name": "Alice Johnson",
+    "phone": "555123456",
+    "email": "alice.j@hotmail.com",
+    "birthday": "1992-11-02",
+    "group": "Family",
+    "phones": []
+  },
+  {
+    "name": "Bob Brown",
+    "phone": "333444555",
+    "email": "bob.brown@company.com",
+    "birthday": "1988-03-10",
+    "group": "Work",
     "phones": [
-      {"phone": "+404040404", "type": "home"},
-      {"phone": "+505050505", "type": "mobile"}
+      {"phone": "666777888", "type": "mobile"}
     ]
   },
   {
-    "name": "Kevin White",
-    "email": "kevin.w@gmail.com",
-    "birthday": "1994-11-28",
-    "group_name": "Other",
+    "name": "Emma Wilson",
+    "phone": "222333444",
+    "email": "emma.w@icloud.com",
+    "birthday": "1995-07-19",
+    "group": "Friend",
+    "phones": []
+  },
+  {
+    "name": "Michael Lee",
+    "phone": "999000111",
+    "email": "michael.lee@gmail.com",
+    "birthday": "1983-12-25",
+    "group": "Other",
     "phones": [
-      {"phone": "+606060606", "type": "mobile"}
+      {"phone": "121212121", "type": "home"},
+      {"phone": "343434343", "type": "mobile"}
     ]
   },
   {
-    "name": "Jessica Robinson",
-    "email": "jessica.r@icloud.com",
-    "birthday": "1997-03-17",
-    "group_name": "Friend",
+    "name": "Sophia Martinez",
+    "phone": "777888999",
+    "email": "sophia.m@yahoo.com",
+    "birthday": "1991-04-08",
+    "group": "Family",
     "phones": [
-      {"phone": "+707070707", "type": "mobile"},
-      {"phone": "+808080808", "type": "home"},
-      {"phone": "+909090909", "type": "work"}
+      {"phone": "565656565", "type": "work"}
     ]
+  },
+  {
+    "name": "David Clark",
+    "phone": "444555666",
+    "email": "david.c@work.net",
+    "birthday": "1986-09-14",
+    "group": "Work",
+    "phones": [
+      {"phone": "878787878", "type": "mobile"}
+    ]
+  },
+  {
+    "name": "Olivia Lewis",
+    "phone": "111222333",
+    "email": "olivia.lewis@gmail.com",
+    "birthday": "1996-01-30",
+    "group": "Friend",
+    "phones": [
+      {"phone": "999888777", "type": "home"}
+    ]
+  },
+  {
+    "name": "James Hall",
+    "phone": "666777888",
+    "email": "james.h@company.com",
+    "birthday": "1989-06-20",
+    "group": "Other",
+    "phones": []
   }
 ]

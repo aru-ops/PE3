@@ -1,0 +1,51 @@
+[
+  {
+    "name": "Alice Cooper",
+    "email": "alice.cooper@gmail.com",
+    "birthday": "1985-02-10",
+    "group_name": "Friend",
+    "phones": [
+      {"phone": "+101010101", "type": "mobile"},
+      {"phone": "+202020202", "type": "work"}
+    ]
+  },
+  {
+    "name": "David Miller",
+    "email": "david.m@company.net",
+    "birthday": "1991-06-12",
+    "group_name": "Work",
+    "phones": [
+      {"phone": "+303030303", "type": "mobile"}
+    ]
+  },
+  {
+    "name": "Sarah Garcia",
+    "email": "sarah.garcia@yahoo.com",
+    "birthday": "1989-09-05",
+    "group_name": "Family",
+    "phones": [
+      {"phone": "+404040404", "type": "home"},
+      {"phone": "+505050505", "type": "mobile"}
+    ]
+  },
+  {
+    "name": "Kevin White",
+    "email": "kevin.w@gmail.com",
+    "birthday": "1994-11-28",
+    "group_name": "Other",
+    "phones": [
+      {"phone": "+606060606", "type": "mobile"}
+    ]
+  },
+  {
+    "name": "Jessica Robinson",
+    "email": "jessica.r@icloud.com",
+    "birthday": "1997-03-17",
+    "group_name": "Friend",
+    "phones": [
+      {"phone": "+707070707", "type": "mobile"},
+      {"phone": "+808080808", "type": "home"},
+      {"phone": "+909090909", "type": "work"}
+    ]
+  }
+]

@@ -1,4 +1,11 @@
-first_name,last_name,phone,email,birthday,group,phone_type
-Ivan,Petrov,+77014561234,ivan@example.com,1990-05-15,Work,mobile
-Anna,Sokolova,+77015672345,anna@gmail.com,1985-11-20,Friend,home
-Dmitry,Ivanov,+77016783456,,1988-03-10,Family,work
+name,email,birthday,group_name,phone,phone_type
+John Doe,johndoe@gmail.com,1990-05-15,Work,+111111111,mobile
+Jane Smith,jane.smith@yahoo.com,1992-10-20,Family,+222222222,home
+Michael Johnson,mike.j@icloud.com,1985-03-08,Friend,+333333333,mobile
+Emily Davis,emily.davis@gmail.com,1998-12-01,Work,+444444444,work
+William Brown,w.brown@company.com,1975-07-22,Work,+555555555,mobile
+Olivia Wilson,olivia.w@hotmail.com,2001-01-14,Friend,+666666666,home
+James Taylor,james.t@gmail.com,1988-09-30,Family,+777777777,mobile
+Sophia Martinez,smartinez@yahoo.com,1995-11-11,Other,+888888888,mobile
+Robert Anderson,rob.anderson@gmail.com,1982-04-18,Friend,+999999999,work
+Isabella Thomas,bella.t@icloud.com,1999-08-25,Family,+000000000,mobile

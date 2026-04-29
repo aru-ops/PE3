@@ -4,5 +4,5 @@ def config():
         "host": "localhost",
         "database": "snake_db",
         "user": "postgres",
-        "password": "ваш_пароль"
+        "password": "12345678"
     }

@@ -1,5 +1,5 @@
 import psycopg2
-from config import config
+from TSIS.TSIS1.config import config
 
 
 def connect():

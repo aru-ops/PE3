@@ -336,14 +336,17 @@ class PaintApp:
             self.screen.blit(self.canvas, CANVAS_RECT)
 
     def save_canvas(self):
-        """Сохраняет холст в RGB‑формате, чтобы PNG открывался везде."""
+        import os
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"canvas_{timestamp}.png"
-        # Конвертируем в поверхность без альфа-канала
+        # Сохраняем в ту же папку, где находится paint.py
+        dir_path = os.path.dirname(os.path.abspath(__file__))
+        fullpath = os.path.join(dir_path, filename)
+    
         rgb_surface = pygame.Surface((self.canvas.get_width(), self.canvas.get_height()))
         rgb_surface.blit(self.canvas, (0, 0))
-        pygame.image.save(rgb_surface, filename)
-        print(f"Saved: {filename}")
+        pygame.image.save(rgb_surface, fullpath)
+        print(f"Saved: {fullpath}")
 
     def draw_text_input_cursor(self):
         if self.text_input_active and self.text_pos:

@@ -16,7 +16,7 @@ BUTTON_HOVER_COLOR = (180, 180, 240)
 ACTIVE_BUTTON_COLOR = (100, 200, 100)
 
 BRUSH_SIZES = {pygame.K_1: 2, pygame.K_2: 5, pygame.K_3: 10}
-BRUSH_SIZE_BUTTONS = [(2, (10, 0)), (5, (10, 35)), (10, (10, 70))]  # relative y
+BRUSH_SIZE_BUTTONS = [(2, (10, 0)), (5, (10, 35)), (10, (10, 70))]
 
 TOOLS = ['pencil', 'line', 'rect', 'circle', 'square', 'right_triangle',
          'equilateral_triangle', 'rhombus', 'eraser', 'fill', 'text', 'color_picker']
@@ -35,6 +35,7 @@ class PaintApp:
         self.font = pygame.font.SysFont("Arial", 16)
         self.small_font = pygame.font.SysFont("Arial", 12)
 
+        # Холст (основная поверхность для рисования)
         self.canvas = pygame.Surface((CANVAS_RECT.width, CANVAS_RECT.height))
         self.canvas.fill(BACKGROUND_COLOR)
 
@@ -59,18 +60,14 @@ class PaintApp:
         self.fill_toggle_rect = None
 
     def draw_toolbar(self):
-        """Draw left toolbar with dynamic spacing to avoid overlaps."""
         self.screen.fill((240, 240, 240), (0, 0, TOOLBAR_WIDTH, WINDOW_HEIGHT))
         pygame.draw.line(self.screen, (0, 0, 0), (TOOLBAR_WIDTH, 0), (TOOLBAR_WIDTH, WINDOW_HEIGHT), 2)
 
         y = 10
-
-        # Title
         title = self.font.render("TOOLS", True, (0, 0, 0))
         self.screen.blit(title, (TOOLBAR_WIDTH//2 - title.get_width()//2, y))
         y += 25
 
-        # Tool buttons (2 columns)
         col_width = TOOLBAR_WIDTH // 2
         for i, tool in enumerate(TOOLS):
             row = i // 2
@@ -89,7 +86,6 @@ class PaintApp:
 
         y += ((len(TOOLS) + 1) // 2) * 35 + 10
 
-        # Brush size section
         size_title = self.font.render("Brush Size", True, (0, 0, 0))
         self.screen.blit(size_title, (TOOLBAR_WIDTH//2 - size_title.get_width()//2, y))
         y += 20
@@ -103,12 +99,14 @@ class PaintApp:
             text = self.small_font.render(str(size), True, (0, 0, 0))
             self.screen.blit(text, (rect.x + 10, rect.y + 7))
             self.brush_buttons.append((rect, size))
-        y += 100  # after brush size buttons
+        y += 100
 
-        # Fill toggle
         fill_text = "Filled" if self.shape_filled else "Outline"
         fill_rect = pygame.Rect(10, y, TOOLBAR_WIDTH - 20, 30)
-        color = BUTTON_COLOR
+        if self.shape_filled:
+            color = (100, 200, 100)
+        else:
+            color = BUTTON_COLOR
         if fill_rect.collidepoint(pygame.mouse.get_pos()):
             color = BUTTON_HOVER_COLOR
         pygame.draw.rect(self.screen, color, fill_rect)
@@ -118,7 +116,6 @@ class PaintApp:
         self.fill_toggle_rect = fill_rect
         y += 40
 
-        # Colors palette
         color_title = self.font.render("Colors", True, (0, 0, 0))
         self.screen.blit(color_title, (TOOLBAR_WIDTH//2 - color_title.get_width()//2, y))
         y += 20
@@ -136,7 +133,6 @@ class PaintApp:
 
         y += ((len(PREDEFINED_COLORS) + cols - 1) // cols) * (swatch_size + 5) + 10
 
-        # Current color
         current_text = self.font.render("Current:", True, (0, 0, 0))
         self.screen.blit(current_text, (10, y))
         color_rect = pygame.Rect(80, y, 50, 25)
@@ -340,10 +336,14 @@ class PaintApp:
             self.screen.blit(self.canvas, CANVAS_RECT)
 
     def save_canvas(self):
-        ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        fname = f"canvas_{ts}.png"
-        pygame.image.save(self.canvas, fname)
-        print(f"Saved: {fname}")
+        """Сохраняет холст в RGB‑формате, чтобы PNG открывался везде."""
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"canvas_{timestamp}.png"
+        # Конвертируем в поверхность без альфа-канала
+        rgb_surface = pygame.Surface((self.canvas.get_width(), self.canvas.get_height()))
+        rgb_surface.blit(self.canvas, (0, 0))
+        pygame.image.save(rgb_surface, filename)
+        print(f"Saved: {filename}")
 
     def draw_text_input_cursor(self):
         if self.text_input_active and self.text_pos:

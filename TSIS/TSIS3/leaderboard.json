@@ -1,8 +1,33 @@
 [
     {
+        "name": "L",
+        "score": 1573,
+        "distance": 433
+    },
+    {
         "name": "\u0416\u0430\u043d\u0438\u044f",
         "score": 1060,
         "distance": 422
+    },
+    {
+        "name": "Asema",
+        "score": 748,
+        "distance": 178
+    },
+    {
+        "name": "Paulo",
+        "score": 482,
+        "distance": 103
+    },
+    {
+        "name": "\u0416\u0430\u043d\u043d\u0430",
+        "score": 434,
+        "distance": 118
+    },
+    {
+        "name": "L",
+        "score": 381,
+        "distance": 68
     },
     {
         "name": "Milana",
@@ -23,15 +48,5 @@
         "name": "\u0416\u0430\u043d\u0438\u044f",
         "score": 201,
         "distance": 100
-    },
-    {
-        "name": "Elena",
-        "score": 191,
-        "distance": 95
-    },
-    {
-        "name": "Milana",
-        "score": 41,
-        "distance": 20
     }
 ]
